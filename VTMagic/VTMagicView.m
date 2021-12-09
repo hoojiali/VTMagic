@@ -63,6 +63,7 @@ static const void *kVTMagicView = &kVTMagicView;
 @synthesize separatorView = _separatorView;
 @synthesize headerView = _headerView;
 @synthesize sliderView = _sliderView;
+@synthesize supplement = _supplement;
 
 #pragma mark - Lifecycle
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -77,6 +78,7 @@ static const void *kVTMagicView = &kVTMagicView;
 
 - (void)addMagicSubviews {
     [self addSubview:self.reviseView];
+    [self addSubview:self.supplement];
     [self addSubview:self.contentView];
     [self addSubview:self.navigationView];
     [self addSubview:self.headerView];
@@ -93,7 +95,9 @@ static const void *kVTMagicView = &kVTMagicView;
     _bubbleRadius = 10;
     _separatorHeight = 0.5;
     _navigationHeight = 44;
+    _supplementHeight = 49;
     _headerHidden = YES;
+    _supplementHidden = YES;
     _scrollEnabled = YES;
     _switchEnabled = YES;
     _needPreloading = YES;
@@ -142,9 +146,14 @@ static const void *kVTMagicView = &kVTMagicView;
     CGRect sliderFrame = [_menuBar sliderFrameAtIndex:_currentPage];
     _sliderView.frame = sliderFrame;
     
+    // supplement
+    CGFloat supplementY = CGRectGetMaxY(_navigationView.frame);
+    CGFloat supplementH = _supplementHidden ? 0 : _supplementHeight;
+    _supplement.frame = CGRectMake(0, supplementY, size.width, supplementH);
+    
     self.needSkipUpdate = YES;
     CGRect originalContentFrame = _contentView.frame;
-    CGFloat contentY = CGRectGetMaxY(_navigationView.frame);
+    CGFloat contentY = CGRectGetMaxY(_supplement.frame);
     CGFloat contentH = size.height - contentY + (_needExtendBottom ? VTTABBAR_HEIGHT : 0);
     _contentView.frame = CGRectMake(0, contentY, size.width, contentH);
     if (!CGRectEqualToRect(_contentView.frame, originalContentFrame)) {
@@ -931,6 +940,22 @@ static VTPanRecognizerDirection direction = VTPanRecognizerDirectionUndefined;
     [_navigationView bringSubviewToFront:_menuBar];
 }
 
+- (UIView *)supplement {
+    if (!_supplement) {
+        _supplement = [[UIView alloc] init];
+        _supplement.backgroundColor = [UIColor yellowColor];
+        _supplement.hidden = _supplementHidden;
+    }
+    return _supplement;
+}
+
+- (void)setCustomSupplement:(UIView *)supplement {
+    [_supplement removeFromSuperview];
+    _supplement = supplement;
+    _supplement.hidden = _supplementHidden;
+    [self addSubview:supplement];
+}
+
 - (VTMenuBar *)menuBar {
     if (!_menuBar) {
         _menuBar = [[VTMenuBar alloc] init];
@@ -1109,6 +1134,22 @@ static VTPanRecognizerDirection direction = VTPanRecognizerDirectionUndefined;
         [self updateFrameForSubviews];
     } completion:^(BOOL finished) {
         _headerView.hidden = _headerHidden;
+    }];
+}
+
+- (void)setSupplementHidden:(BOOL)supplementHidden {
+    _supplementHidden = supplementHidden;
+    _supplement.hidden = supplementHidden;
+    [self updateFrameForSubviews];
+}
+
+- (void)setSupplementHidden:(BOOL)supplementHidden duration:(CGFloat)duration {
+    _supplement.hidden = NO;
+    _supplementHidden = supplementHidden;
+    [UIView animateWithDuration:duration animations:^{
+        [self updateFrameForSubviews];
+    } completion:^(BOOL finished) {
+        _supplement.hidden = _supplementHidden;
     }];
 }
 

@@ -490,6 +490,27 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)clearMemoryCache;
 
+
+// MARK: supplement
+
+/// VT导航与Content之间的补充视图
+/// 默认隐藏, 需显示通过supplementHidden进行设置
+@property (nonatomic, strong, readonly) UIView *supplement;
+/// 补充视图高度, 默认49pt
+@property (nonatomic, assign) CGFloat supplementHeight;
+/// 是否隐藏补充视图, 默认YES
+@property (nonatomic, assign, getter=isSupplementHidden) BOOL supplementHidden;
+
+/// 显示或者隐藏补充视图组件
+/// @param supplementHidden 是否隐藏
+/// @param duration 动画时间
+- (void)setSupplementHidden:(BOOL)supplementHidden duration:(CGFloat)duration;
+
+/// 设置自定义补充视图
+/// @param supplement 自定义补充视图
+- (void)setCustomSupplement:(UIView *)supplement;
+
+
 NS_ASSUME_NONNULL_END
 
 @end
